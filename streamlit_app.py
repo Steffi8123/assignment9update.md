@@ -435,7 +435,7 @@ if results and df is not None:
     st.markdown("### ✅ Recommendations for the team")
     for r in selected_item.get("recommendations", []):
         st.markdown(f"- {r}")
-
+        
 # ---------- FOOTER ----------
 st.markdown("---")
 st.markdown(
