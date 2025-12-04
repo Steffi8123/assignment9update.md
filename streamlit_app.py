@@ -347,7 +347,6 @@ if results and df is not None:
     chart_df = chart_df.set_index("Page / URL")[["Clarity score", "Empathy score"]]
 
     st.bar_chart(chart_df)
-
     # ---------- PAGE DEEP-DIVE ----------
     st.markdown("---")
     st.markdown('<div class="section-title"><span>🔍 Page deep-dive</span></div>', unsafe_allow_html=True)
@@ -356,12 +355,25 @@ if results and df is not None:
         unsafe_allow_html=True,
     )
 
+    # dropdown uses exactly what is in the table
     selected_url = st.selectbox(
         "Select a page / URL to view detailed insights:",
         df["Page / URL"].tolist()
     )
 
-    selected_item = next(item for item in results if item["url"] == selected_url)
+    # make sure we match cleanly (strip spaces)
+    safe_selected = selected_url.strip()
+
+    # find the matching result
+    selected_item = None
+    for item in results:
+        if item["url"].strip() == safe_selected:
+            selected_item = item
+            break
+
+    # fallback: if something weird happens, default to first
+    if selected_item is None and results:
+        selected_item = results[0]
 
     colA, colB = st.columns(2)
 
