@@ -8,6 +8,12 @@ st.set_page_config(
     layout="wide",
 )
 
+# ---------- SESSION STATE SETUP ----------
+if "pentrust_results" not in st.session_state:
+    st.session_state["pentrust_results"] = []
+if "pentrust_df" not in st.session_state:
+    st.session_state["pentrust_df"] = None
+
 # ---------- GLOBAL STYLES ----------
 st.markdown("""
 <style>
@@ -209,7 +215,6 @@ with right:
 # ---------- DUMMY ANALYSIS (REPLACE WITH REAL API LATER) ----------
 def analyze_url_dummy(url: str) -> dict:
     """Demo analysis so the UI works even without a backend."""
-    # Simple rules to vary things a bit by URL label
     url_lower = url.lower()
     if "alert" in url_lower or "icu" in url_lower:
         risk = "High"
@@ -270,9 +275,7 @@ def analyze_url_dummy(url: str) -> dict:
         ],
     }
 
-# ---------- MAIN ACTION ----------
-results = []
-df = None
+# ---------- RUN ANALYSIS & STORE IN SESSION ----------
 
 if run_button:
     urls = []
@@ -284,11 +287,11 @@ if run_button:
     else:
         st.success(f"Running demo PenTrust analysis for {len(urls)} item(s)…")
 
+        results = []
         for url in urls:
             data = analyze_url_dummy(url)
             results.append(data)
 
-        # Build summary df
         df_rows = []
         for item in results:
             df_rows.append({
@@ -302,6 +305,14 @@ if run_button:
             })
         df = pd.DataFrame(df_rows)
 
+        # store in session so dropdown changes still see the data
+        st.session_state["pentrust_results"] = results
+        st.session_state["pentrust_df"] = df
+
+# always read from session for the dashboard
+results = st.session_state["pentrust_results"]
+df = st.session_state["pentrust_df"]
+
 # ---------- RESULTS UI (ONLY IF WE HAVE RESULTS) ----------
 if results and df is not None:
 
@@ -312,7 +323,6 @@ if results and df is not None:
         unsafe_allow_html=True,
     )
 
-    # High-level metrics
     total_urls = len(df)
     score_map = {"Low": 1, "Medium": 2, "High": 3}
 
@@ -328,25 +338,21 @@ if results and df is not None:
     m4.metric("Supportive tone (Med/High)", f"{good_empathy}/{total_urls}")
     m5.metric("WCAG pass (demo)", f"{wcag_pass}/{total_urls}")
 
-    # Summary table in a card
     with st.expander("View summary table"):
         st.dataframe(df, use_container_width=True)
 
-    # Issue categories chart
     st.markdown('<div class="section-title"><span>🧩 Issues by category</span></div>', unsafe_allow_html=True)
     cat_counts = df["Issue category"].value_counts().reset_index()
     cat_counts.columns = ["Issue category", "Count"]
     st.bar_chart(cat_counts.set_index("Issue category"))
 
-    # Clarity vs Empathy chart
     st.markdown('<div class="section-title"><span>🧠 Clarity vs tone safety</span></div>', unsafe_allow_html=True)
-
     chart_df = df.copy()
     chart_df["Clarity score"] = chart_df["Clarity"].map(score_map)
     chart_df["Empathy score"] = chart_df["Empathy"].map(score_map)
     chart_df = chart_df.set_index("Page / URL")[["Clarity score", "Empathy score"]]
-
     st.bar_chart(chart_df)
+
     # ---------- PAGE DEEP-DIVE ----------
     st.markdown("---")
     st.markdown('<div class="section-title"><span>🔍 Page deep-dive</span></div>', unsafe_allow_html=True)
@@ -355,23 +361,18 @@ if results and df is not None:
         unsafe_allow_html=True,
     )
 
-    # dropdown uses exactly what is in the table
     selected_url = st.selectbox(
         "Select a page / URL to view detailed insights:",
         df["Page / URL"].tolist()
     )
-
-    # make sure we match cleanly (strip spaces)
     safe_selected = selected_url.strip()
 
-    # find the matching result
     selected_item = None
     for item in results:
         if item["url"].strip() == safe_selected:
             selected_item = item
             break
 
-    # fallback: if something weird happens, default to first
     if selected_item is None and results:
         selected_item = results[0]
 
@@ -435,7 +436,7 @@ if results and df is not None:
     st.markdown("### ✅ Recommendations for the team")
     for r in selected_item.get("recommendations", []):
         st.markdown(f"- {r}")
-        
+
 # ---------- FOOTER ----------
 st.markdown("---")
 st.markdown(
