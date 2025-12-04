@@ -31,7 +31,8 @@ body, .stApp {
 
 /* Main container padding */
 .block-container {
-  padding-top: 1.4rem;
+  padding-top: 4rem !important;
+  padding-bottom: 2rem;
 }
 
 /* Buttons */
