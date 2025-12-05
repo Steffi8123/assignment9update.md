@@ -565,8 +565,6 @@ elif page == "Deep Analysis":
         # 4) Readability mismatch
         if "Readability mismatch" in issue_titles:
             st.markdown("### 4. Readability may be too complex for broad patient use")
-            st.caption("Problem → Fix → Before/After for presentation use.")
-
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown("**⚠️ Problem signal**")
