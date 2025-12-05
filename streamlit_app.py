@@ -496,7 +496,7 @@ elif page == "Deep Analysis":
         # 1) Dense instructions
         if "Dense instructions" in issue_titles:
             st.markdown("### 1. Instructions are too dense for quick scanning")
-            st.caption("Problem → Fix → Before/After for presentation use.")
+
 
             col1, col2 = st.columns(2)
             with col1:
