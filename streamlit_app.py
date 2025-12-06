@@ -496,8 +496,6 @@ elif page == "Deep Analysis":
         # 1) Dense instructions
         if "Dense instructions" in issue_titles:
             st.markdown("### 1. Instructions are too dense for quick scanning")
-
-
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown("**⚠️ Problem signal**")
@@ -522,8 +520,6 @@ elif page == "Deep Analysis":
         # 2) Unclear next steps
         if "Unclear next steps" in issue_titles:
             st.markdown("### 2. Next steps are unclear after key actions")
-            st.caption("Problem → Fix → Before/After for presentation use.")
-
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown("**⚠️ Problem signal**")
@@ -542,8 +538,6 @@ elif page == "Deep Analysis":
         # 3) Weak micro trust
         if "Weak micro trust" in issue_titles:
             st.markdown("### 3. Trust signals need reinforcement near sensitive moments")
-            st.caption("Problem → Fix → Before/After for presentation use.")
-
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown("**⚠️ Problem signal**")
@@ -583,8 +577,6 @@ elif page == "Deep Analysis":
         # 5) Accessibility-aware writing
         if "Accessibility gaps" in issue_titles:
             st.markdown("### 5. Accessibility-aware writing structure is inconsistent")
-            st.caption("Problem → Fix → Quick checklist.")
-
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown("**⚠️ Problem signal**")
